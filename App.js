@@ -39,13 +39,13 @@ function initFirebase() {
     // → Your apps → Web app → Copy config
     // ──────────────────────────────────────────
     const firebaseConfig = {
-      apiKey:            "YOUR_API_KEY",
-      authDomain:        "YOUR_PROJECT.firebaseapp.com",
-      databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-      projectId:         "YOUR_PROJECT_ID",
-      storageBucket:     "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId:             "YOUR_APP_ID"
+      apiKey:            "AIzaSyAZTW4FWt0xn1AEWcrVA7Xss3c1bZ3stVA",
+      authDomain:        "chessmaster-1c96a.firebaseapp.com",
+      databaseURL:       "https://chessmaster-1c96a-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId:         "chessmaster-1c96a",
+      storageBucket:     "chessmaster-1c96a.firebasestorage.app",
+      messagingSenderId: "984344433718",
+      appId:             "1:984344433718:web:d035baa29c7854a73cb497"
     };
 
     if (firebaseConfig.apiKey === "YOUR_API_KEY") {
