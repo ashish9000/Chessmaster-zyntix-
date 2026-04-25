@@ -33,11 +33,6 @@ let storage     = null;
 
 function initFirebase() {
   try {
-    // ──────────────────────────────────────────
-    // PASTE YOUR FIREBASE CONFIG BELOW:
-    // Go to Firebase Console → Project Settings
-    // → Your apps → Web app → Copy config
-    // ──────────────────────────────────────────
     const firebaseConfig = {
       apiKey:            "AIzaSyAZTW4FWt0xn1AEWcrVA7Xss3c1bZ3stVA",
       authDomain:        "chessmaster-1c96a.firebaseapp.com",
@@ -47,20 +42,15 @@ function initFirebase() {
       messagingSenderId: "984344433718",
       appId:             "1:984344433718:web:d035baa29c7854a73cb497"
     };
-
-    if (firebaseConfig.apiKey === "YOUR_API_KEY") {
-      console.warn('[Firebase] Config not set. Running in offline/guest mode.');
-      return;
-    }
-
     firebaseApp = firebase.initializeApp(firebaseConfig);
     auth        = firebase.auth();
     db          = firebase.database();
     storage     = firebase.storage();
     window.db   = db;
-    console.log('[Firebase] Connected ✅');
+    console.log("[Firebase] Connected");
   } catch (e) {
-    console.warn('[Firebase] Init failed:', e.message);
+    console.warn("[Firebase] Init failed:", e.message);
+    auth = null; db = null;
   }
 }
 
@@ -1608,41 +1598,46 @@ window.addEventListener('load', () => {
   // ── Spawn splash particles ──
   _spawnSplashParticles();
 
-  // ── Splash dismiss + auto-login ──
-  setTimeout(() => {
-    // 1. Hide splash screen
+  // ── Hide splash and show correct screen ──
+  function hideSplashAndStart() {
     const splashEl = document.getElementById('screen-splash');
     if (splashEl) {
       splashEl.style.transition = 'opacity 0.4s';
-      splashEl.style.opacity    = '0';
+      splashEl.style.opacity = '0';
       setTimeout(() => {
-        splashEl.classList.remove('active');
         splashEl.style.display = 'none';
+        splashEl.classList.remove('active');
       }, 400);
     }
-
-    // 2. After splash hides, decide which screen to show
+    // Show next screen after fade
     setTimeout(() => {
       if (auth) {
-        // Firebase available — check login state
+        let authResolved = false;
+        // Fallback in case Firebase hangs
+        const fallbackTimer = setTimeout(() => {
+          if (!authResolved) {
+            authResolved = true;
+            _tryGuestAutoLogin();
+          }
+        }, 4000);
         auth.onAuthStateChanged(async (user) => {
+          if (authResolved) return;
+          authResolved = true;
+          clearTimeout(fallbackTimer);
           if (user) {
-            try {
-              await _loadUserFromDB(user.uid);
-            } catch (e) {
-              _tryGuestAutoLogin();
-            }
+            try { await _loadUserFromDB(user.uid); }
+            catch (e) { _tryGuestAutoLogin(); }
           } else {
             _tryGuestAutoLogin();
           }
         });
       } else {
-        // No Firebase — just show auth or guest
         _tryGuestAutoLogin();
       }
-    }, 450);
+    }, 500);
+  }
 
-  }, 2600);
+  setTimeout(hideSplashAndStart, 2800);
 });
 
 function _tryGuestAutoLogin() {
