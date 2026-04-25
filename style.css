@@ -92,8 +92,19 @@ input, textarea, select {
   display: none;
   flex-direction: column;
   background: var(--bg-0);
+  z-index: 1;
 }
-.screen.active { display: flex; }
+.screen.active {
+  display: flex;
+  z-index: 10;
+}
+#screen-splash {
+  z-index: 9999 !important;
+  display: flex !important;
+}
+#screen-splash.active {
+  display: flex !important;
+}
 
 /* ─── SCREEN HEADER ─── */
 .screen-header {
