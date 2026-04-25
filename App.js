@@ -39,13 +39,13 @@ function initFirebase() {
     // → Your apps → Web app → Copy config
     // ──────────────────────────────────────────
     const firebaseConfig = {
-      apiKey:            "AIzaSyAZTW4FWt0xn1AEWcrVA7Xss3c1bZ3stVA",
-      authDomain:        "chessmaster-1c96a.firebaseapp.com",
-      databaseURL:       "https://chessmaster-1c96a-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId:         "chessmaster-1c96a",
-      storageBucket:     "chessmaster-1c96a.firebasestorage.app",
-      messagingSenderId: "984344433718",
-      appId:             "1:984344433718:web:d035baa29c7854a73cb497"
+      apiKey:            "YOUR_API_KEY",
+      authDomain:        "YOUR_PROJECT.firebaseapp.com",
+      databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+      projectId:         "YOUR_PROJECT_ID",
+      storageBucket:     "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId:             "YOUR_APP_ID"
     };
 
     if (firebaseConfig.apiKey === "YOUR_API_KEY") {
@@ -82,15 +82,18 @@ function showScreen(id) {
   const cur = _screenHistory[_screenHistory.length - 1];
   if (cur !== id) _screenHistory.push(id);
 
-  // Hide all screens
+  // Hide ALL screens completely
   document.querySelectorAll('.screen').forEach(s => {
     s.classList.remove('active');
-    s.style.display = '';
+    s.style.display = 'none';
   });
 
   // Show target screen
   const el = document.getElementById(id);
-  if (el) el.classList.add('active');
+  if (el) {
+    el.style.display = 'flex';
+    el.classList.add('active');
+  }
 
   // Scroll to top
   window.scrollTo(0, 0);
@@ -1602,36 +1605,44 @@ window.addEventListener('load', () => {
   // Load completed lessons
   LessonSystem._completed = new Set(Storage.get('completed_lessons', []));
 
-  // ── Firebase auto-login ──
-  if (auth) {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        try {
-          await _loadUserFromDB(user.uid);
-        } catch (e) {
-          _tryGuestAutoLogin();
-        }
-      } else {
-        _tryGuestAutoLogin();
-      }
-    });
-  } else {
-    // No Firebase — try guest restore after splash
-    setTimeout(_tryGuestAutoLogin, 2500);
-  }
-
-  // ── Splash auto-dismiss ──
-  setTimeout(() => {
-    const splashEl = document.getElementById('screen-splash');
-    if (splashEl) {
-      splashEl.style.transition = 'opacity 0.5s';
-      splashEl.style.opacity    = '0';
-      setTimeout(() => splashEl.classList.remove('active'), 500);
-    }
-  }, 2400);
-
   // ── Spawn splash particles ──
   _spawnSplashParticles();
+
+  // ── Splash dismiss + auto-login ──
+  setTimeout(() => {
+    // 1. Hide splash screen
+    const splashEl = document.getElementById('screen-splash');
+    if (splashEl) {
+      splashEl.style.transition = 'opacity 0.4s';
+      splashEl.style.opacity    = '0';
+      setTimeout(() => {
+        splashEl.classList.remove('active');
+        splashEl.style.display = 'none';
+      }, 400);
+    }
+
+    // 2. After splash hides, decide which screen to show
+    setTimeout(() => {
+      if (auth) {
+        // Firebase available — check login state
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            try {
+              await _loadUserFromDB(user.uid);
+            } catch (e) {
+              _tryGuestAutoLogin();
+            }
+          } else {
+            _tryGuestAutoLogin();
+          }
+        });
+      } else {
+        // No Firebase — just show auth or guest
+        _tryGuestAutoLogin();
+      }
+    }, 450);
+
+  }, 2600);
 });
 
 function _tryGuestAutoLogin() {
