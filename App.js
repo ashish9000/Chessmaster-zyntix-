@@ -68,39 +68,38 @@ window.currentUser = null;
 let _screenHistory = ['screen-splash'];
 
 function showScreen(id) {
-  // Save to history (avoid duplicates)
-  const cur = _screenHistory[_screenHistory.length - 1];
-  if (cur !== id) _screenHistory.push(id);
+  try {
+    // Save history
+    const cur = _screenHistory[_screenHistory.length - 1];
+    if (cur !== id) _screenHistory.push(id);
 
-  // Hide ALL screens completely
-  document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('active');
-    s.style.display = 'none';
-  });
+    // Hide all screens
+    const allScreens = document.querySelectorAll('.screen');
+    allScreens.forEach(s => {
+      s.style.display = 'none';
+      s.classList.remove('active');
+    });
 
-  // Show target screen
-  const el = document.getElementById(id);
-  if (el) {
-    el.style.display = 'flex';
-    el.classList.add('active');
+    // Show target
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.cssText = 'display:flex !important; flex-direction:column;';
+      el.classList.add('active');
+      el.scrollTop = 0;
+    }
+
+    try { SoundSystem.buttonClick(); } catch(e) {}
+
+    // Hooks
+    if (id === 'screen-leaderboard')   loadLeaderboard('global');
+    if (id === 'screen-profile')       refreshProfile();
+    if (id === 'screen-puzzles')       PuzzleSystem.init();
+    if (id === 'screen-learn')         LessonSystem.renderLevelList();
+    if (id === 'screen-friends')       loadFriends();
+    if (id === 'screen-notifications') renderNotifications();
+  } catch(e) {
+    console.error('showScreen error:', e);
   }
-
-  // Scroll to top
-  window.scrollTo(0, 0);
-  if (el) el.scrollTop = 0;
-
-  SoundSystem.buttonClick();
-
-  // Screen-specific init hooks
-  const hooks = {
-    'screen-leaderboard':    () => loadLeaderboard('global'),
-    'screen-profile':        () => refreshProfile(),
-    'screen-puzzles':        () => PuzzleSystem.init(),
-    'screen-learn':          () => LessonSystem.renderLevelList(),
-    'screen-friends':        () => loadFriends(),
-    'screen-notifications':  () => renderNotifications(),
-  };
-  if (hooks[id]) hooks[id]();
 }
 
 function goBack() {
