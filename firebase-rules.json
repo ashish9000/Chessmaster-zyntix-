@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read":  "auth != null",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "leaderboard": {
+      ".read":  true,
+      ".write": "auth != null"
+    },
+    "rooms": {
+      ".read":  "auth != null",
+      ".write": "auth != null"
+    },
+    "matchmaking": {
+      ".read":  "auth != null",
+      ".write": "auth != null"
+    },
+    "tournaments": {
+      ".read":  true,
+      ".write": "auth != null"
+    },
+    "friends": {
+      "$uid": {
+        ".read":  "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    }
+  }
+}
