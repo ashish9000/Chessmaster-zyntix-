@@ -1011,5 +1011,48 @@
 <script src="engine.js"></script>
 <script src="app.js"></script>
 
+<!-- EMERGENCY SPLASH FIX -->
+<script>
+  // This runs after all scripts load
+  // Guarantees splash hides and auth screen shows
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      // Force hide splash
+      var splash = document.getElementById('screen-splash');
+      if (splash) {
+        splash.style.display = 'none';
+        splash.classList.remove('active');
+      }
+      // If no screen is visible, show auth
+      var anyVisible = false;
+      document.querySelectorAll('.screen').forEach(function(s) {
+        if (s.style.display === 'flex' || s.classList.contains('active')) {
+          if (s.id !== 'screen-splash') anyVisible = true;
+        }
+      });
+      if (!anyVisible) {
+        // Try guest first
+        var guest = null;
+        try { guest = JSON.parse(localStorage.getItem('zx_guest_user')); } catch(e) {}
+        if (guest && guest.uid) {
+          window.currentUser = guest;
+          if (typeof _onLoginSuccess === 'function') _onLoginSuccess();
+        } else {
+          if (typeof showScreen === 'function') {
+            showScreen('screen-auth');
+          } else {
+            var authEl = document.getElementById('screen-auth');
+            if (authEl) {
+              authEl.style.display = 'flex';
+              authEl.style.flexDirection = 'column';
+              authEl.classList.add('active');
+            }
+          }
+        }
+      }
+    }, 5000); // 5 second hard fallback
+  });
+</script>
+
 </body>
 </html>
