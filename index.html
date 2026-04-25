@@ -1,5 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+  <script>
+// SPLASH FIX - runs immediately
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    document.querySelectorAll('.screen').forEach(function(s) {
+      s.style.display = 'none';
+      s.classList.remove('active');
+    });
+    var auth = document.getElementById('screen-auth');
+    auth.style.display = 'flex';
+    auth.style.flexDirection = 'column';
+    auth.style.position = 'fixed';
+    auth.style.inset = '0';
+    auth.classList.add('active');
+    var splash = document.getElementById('screen-splash');
+    splash.style.display = 'none';
+  }, 3000);
+});
+  </script>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
