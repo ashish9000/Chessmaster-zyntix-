@@ -93,17 +93,23 @@ input, textarea, select {
   flex-direction: column;
   background: var(--bg-0);
   z-index: 1;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 .screen.active {
-  display: flex;
+  display: flex !important;
+  flex-direction: column !important;
   z-index: 10;
 }
 #screen-splash {
   z-index: 9999 !important;
   display: flex !important;
+  flex-direction: column !important;
 }
-#screen-splash.active {
+#screen-auth.active {
   display: flex !important;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ─── SCREEN HEADER ─── */
