@@ -1,25 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-// SPLASH FIX - runs immediately
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
-    document.querySelectorAll('.screen').forEach(function(s) {
-      s.style.display = 'none';
-      s.classList.remove('active');
-    });
-    var auth = document.getElementById('screen-auth');
-    auth.style.display = 'flex';
-    auth.style.flexDirection = 'column';
-    auth.style.position = 'fixed';
-    auth.style.inset = '0';
-    auth.classList.add('active');
-    var splash = document.getElementById('screen-splash');
-    splash.style.display = 'none';
-  }, 3000);
-});
-  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0a0e1a" />
@@ -175,48 +156,48 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- Mode Cards Grid -->
   <div class="mode-grid">
 
-    <div class="mode-card card-online" onclick="showScreen('screen-online')">
+    <button class="mode-card card-online" onclick="showScreen('screen-online')">
       <div class="card-shine"></div>
       <div class="card-live-badge">● LIVE</div>
       <div class="card-icon">🌐</div>
       <div class="card-name">ONLINE</div>
       <div class="card-desc">Real Players Worldwide</div>
-    </div>
+    </button>
 
-    <div class="mode-card card-ai" onclick="showScreen('screen-ai-setup')">
+    <button class="mode-card card-ai" onclick="showScreen('screen-ai-setup')">
       <div class="card-shine"></div>
       <div class="card-icon">🤖</div>
       <div class="card-name">vs AI</div>
       <div class="card-desc">5 Difficulty Levels</div>
-    </div>
+    </button>
 
-    <div class="mode-card card-local" onclick="startLocalGame()">
+    <button class="mode-card card-local" onclick="startLocalGame()">
       <div class="card-shine"></div>
       <div class="card-icon">👥</div>
       <div class="card-name">LOCAL 2P</div>
       <div class="card-desc">Same Device</div>
-    </div>
+    </button>
 
-    <div class="mode-card card-learn" onclick="showScreen('screen-learn')">
+    <button class="mode-card card-learn" onclick="showScreen('screen-learn')">
       <div class="card-shine"></div>
       <div class="card-icon">🎓</div>
       <div class="card-name">LEARN</div>
       <div class="card-desc">Level-wise Tutorials</div>
-    </div>
+    </button>
 
-    <div class="mode-card card-puzzle" onclick="showScreen('screen-puzzles')">
+    <button class="mode-card card-puzzle" onclick="showScreen('screen-puzzles')">
       <div class="card-shine"></div>
       <div class="card-icon">🧩</div>
       <div class="card-name">PUZZLES</div>
       <div class="card-desc">Daily Challenges</div>
-    </div>
+    </button>
 
-    <div class="mode-card card-analysis" onclick="showScreen('screen-analysis')">
+    <button class="mode-card card-analysis" onclick="showScreen('screen-analysis')">
       <div class="card-shine"></div>
       <div class="card-icon">📊</div>
       <div class="card-name">ANALYSIS</div>
       <div class="card-desc">Review Your Games</div>
-    </div>
+    </button>
 
   </div>
 
@@ -1030,6 +1011,48 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="engine.js"></script>
 <script src="app.js"></script>
 
+<!-- EMERGENCY SPLASH FIX -->
+<script>
+  // This runs after all scripts load
+  // Guarantees splash hides and auth screen shows
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      // Force hide splash
+      var splash = document.getElementById('screen-splash');
+      if (splash) {
+        splash.style.display = 'none';
+        splash.classList.remove('active');
+      }
+      // If no screen is visible, show auth
+      var anyVisible = false;
+      document.querySelectorAll('.screen').forEach(function(s) {
+        if (s.style.display === 'flex' || s.classList.contains('active')) {
+          if (s.id !== 'screen-splash') anyVisible = true;
+        }
+      });
+      if (!anyVisible) {
+        // Try guest first
+        var guest = null;
+        try { guest = JSON.parse(localStorage.getItem('zx_guest_user')); } catch(e) {}
+        if (guest && guest.uid) {
+          window.currentUser = guest;
+          if (typeof _onLoginSuccess === 'function') _onLoginSuccess();
+        } else {
+          if (typeof showScreen === 'function') {
+            showScreen('screen-auth');
+          } else {
+            var authEl = document.getElementById('screen-auth');
+            if (authEl) {
+              authEl.style.display = 'flex';
+              authEl.style.flexDirection = 'column';
+              authEl.classList.add('active');
+            }
+          }
+        }
+      }
+    }, 5000); // 5 second hard fallback
+  });
+</script>
 
 </body>
 </html>
